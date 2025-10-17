@@ -25,7 +25,7 @@ Grading
 | Student Number | Student Name | Student Email |
 |-|-|-|
 |(STUDENT NUMBER HERE)| (STUDENT NAME HERE)| (STUDENT EMAIL HERE) |
-|(STUDENT NUMBER HERE)| (STUDENT NAME HERE)| (STUDENT EMAIL HERE) |
+|(802232943)| (Lorenzo Castellini Coutin)| (lorenzo.castellini@upr.edu) |
 
 ---
 
