@@ -24,7 +24,7 @@ Grading
 ## Team Info
 | Student Number | Student Name | Student Email |
 |-|-|-|
-|(STUDENT NUMBER HERE)| (STUDENT NAME HERE)| (STUDENT EMAIL HERE) |
+|(802238291)| (Fabián Rodríguez Ortega)| (fabian.rodriguez15@upr.edu) |
 |(802232943)| (Lorenzo Castellini Coutin)| (lorenzo.castellini@upr.edu) |
 
 ---
