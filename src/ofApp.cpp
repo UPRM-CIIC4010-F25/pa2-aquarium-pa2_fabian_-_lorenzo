@@ -42,6 +42,16 @@ void ofApp::setup(){
         std::move(player), std::move(myAquarium), GameSceneKindToString(GameSceneKind::AQUARIUM_GAME)
     )); // player and aquarium are owned by the scene moving forward
 
+    // Music setup
+    if(gameMusic.load("rainyday.mp3")) {
+        gameMusic.setLoop(true);
+        gameMusic.play();
+        gameMusic.setVolume(0.75f);
+    } 
+    else {
+        ofLogError() << "Failed to load the awesome game gameMusic!";  // Added some an error message just in case
+    }
+
     // Load font for game over message
     gameOverTitle.load("Verdana.ttf", 12, true, true);
     gameOverTitle.setLineHeight(34.0f);
@@ -60,7 +70,10 @@ void ofApp::setup(){
 void ofApp::update(){
     
     if(gameManager->GetActiveSceneName() == GameSceneKindToString(GameSceneKind::GAME_OVER)){
-        return; // Stop updating if game is over or exiting
+        if(gameMusic.isPlaying()) {
+            gameMusic.stop();
+        }
+        return; // Stop updating if game is over or exiting. The music also stops once game is over.
     }
 
     if(gameManager->GetActiveSceneName() == GameSceneKindToString(GameSceneKind::AQUARIUM_GAME)){
