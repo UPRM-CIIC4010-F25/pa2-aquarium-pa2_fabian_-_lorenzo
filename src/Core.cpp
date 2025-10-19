@@ -68,6 +68,10 @@ void GameEvent::print() const {
 
 // collision detection between two creatures
 bool checkCollision(std::shared_ptr<Creature> a, std::shared_ptr<Creature> b) {
+    double distance = sqrt(pow(a->getX()-b->getX(),2.0) + pow(a->getY()-b->getY(),2.0));
+    if(distance < a->getCollisionRadius() || distance < b->getCollisionRadius())
+        return true;
+        
     return false; 
 };
 
