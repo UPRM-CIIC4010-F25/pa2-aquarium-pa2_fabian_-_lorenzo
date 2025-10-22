@@ -10,7 +10,7 @@
 enum class AquariumCreatureType {
     NPCreature,
     BiggerFish,
-    MadNPCreature
+    FastNPCreature
 };
 
 string AquariumCreatureTypeToString(AquariumCreatureType t);
@@ -93,11 +93,11 @@ public:
     void move() override;
     void draw() const override;
 };
-
-class MadNPCreature : public NPCreature {
+//New fish species that inherits from NPCreature class
+class FastNPCreature : public NPCreature {
 public:
-    MadNPCreature(float x, float y, int speed, std::shared_ptr<GameSprite> sprite);
-    void move() override;
+    FastNPCreature(float x, float y, int speed, std::shared_ptr<GameSprite> sprite);
+    void move() override; //Since movement behaviour will be different, must overide this from parent class
 };
 
 
@@ -109,7 +109,7 @@ class AquariumSpriteManager {
     private:
         std::shared_ptr<GameSprite> m_npc_fish;
         std::shared_ptr<GameSprite> m_big_fish;
-        std::shared_ptr<GameSprite> m_mad_fish;
+        std::shared_ptr<GameSprite> m_fast_fish; //added new fist species for future implementation
 };
 
 
@@ -168,12 +168,12 @@ class AquariumGameScene : public GameScene {
         AwaitFrames updateControl{5};
 };
 
-
+//Added new fish species in order for it to be rendered according to the level
 class Level_0 : public AquariumLevel  {
     public:
         Level_0(int levelNumber, int targetScore): AquariumLevel(levelNumber, targetScore){
             this->m_levelPopulation.push_back(std::make_shared<AquariumLevelPopulationNode>(AquariumCreatureType::NPCreature, 6));
-             this->m_levelPopulation.push_back(std::make_shared<AquariumLevelPopulationNode>(AquariumCreatureType::MadNPCreature, 3));
+            this->m_levelPopulation.push_back(std::make_shared<AquariumLevelPopulationNode>(AquariumCreatureType::FastNPCreature, 3));
 
         };
         std::vector<AquariumCreatureType> Repopulate() override;
