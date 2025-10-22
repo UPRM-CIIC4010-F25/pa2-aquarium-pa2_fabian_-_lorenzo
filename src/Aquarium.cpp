@@ -1,5 +1,6 @@
 #include "Aquarium.h"
 #include <cstdlib>
+#include <cmath>
 
 
 string AquariumCreatureTypeToString(AquariumCreatureType t){
@@ -9,7 +10,9 @@ string AquariumCreatureTypeToString(AquariumCreatureType t){
         case AquariumCreatureType::NPCreature:
             return "BaseFish";
         case AquariumCreatureType::FastNPCreature:
-            return "MadFish"; 
+            return "FastFish"; 
+        case AquariumCreatureType::NewNemoCreature:
+            return "NewNemoFish";
         default:
             return "UknownFish";
     }
@@ -106,6 +109,28 @@ FastNPCreature::FastNPCreature(float x, float y, int speed, std::shared_ptr<Game
 }
 
 //Overide of move function in FastNPCreature class
+void NewNemoCreature::move() {
+    m_x += m_dx * m_speed ;
+    m_y += sin(m_x * 0.06f) * 2.0f;
+    if(m_dx < 0 ){
+        this->m_sprite->setFlipped(true);
+    }else {
+        this->m_sprite->setFlipped(false);
+    }
+    bounce();
+}
+
+//Nemo constructor implementation
+NewNemoCreature::NewNemoCreature(float x, float y, int speed, std::shared_ptr<GameSprite> sprite)
+: NPCreature(x, y, speed, sprite) {
+    m_dx = (rand() % 3 - 1); // -1, 0, or 1
+    m_dy = (rand() % 3 - 1); // -1, 0, or 1
+    normalize();
+
+    m_creatureType = AquariumCreatureType::NewNemoCreature;
+}
+
+//Overide of move function in NewNemoCreature class
 void FastNPCreature::move() {
     m_x += m_dx * m_speed * 3;
     m_y += m_dy * m_speed * 3;
@@ -116,6 +141,7 @@ void FastNPCreature::move() {
     }
     bounce();
 }
+
 
 void NPCreature::draw() const {
     ofLogVerbose() << "NPCreature at (" << m_x << ", " << m_y << ") with speed " << m_speed << std::endl;
@@ -161,6 +187,8 @@ AquariumSpriteManager::AquariumSpriteManager(){
     this->m_npc_fish = std::make_shared<GameSprite>("base-fish.png", 70,70);
     this->m_big_fish = std::make_shared<GameSprite>("bigger-fish.png", 120, 120);
     this->m_fast_fish = std::make_shared<GameSprite>("base-fish.2.png", 70, 70);
+    this->m_nemo_fish = std::make_shared<GameSprite>("nemo_v2.png", 70, 70);
+    
 }
 
 std::shared_ptr<GameSprite> AquariumSpriteManager::GetSprite(AquariumCreatureType t){
@@ -173,6 +201,9 @@ std::shared_ptr<GameSprite> AquariumSpriteManager::GetSprite(AquariumCreatureTyp
 
         case AquariumCreatureType::FastNPCreature:
             return std::make_shared<GameSprite>(*this->m_fast_fish); //added fastfish for further implementation
+
+        case AquariumCreatureType::NewNemoCreature:
+            return std::make_shared<GameSprite>(*this->m_nemo_fish); //added nemo for further implementation
         default:
             return nullptr;
     }
@@ -250,6 +281,9 @@ void Aquarium::SpawnCreature(AquariumCreatureType type) {
         //Added FastNPCreature in creature spawning
         case AquariumCreatureType::FastNPCreature:
             this->addCreature(std::make_shared<FastNPCreature>(x, y, speed, this->m_sprite_manager->GetSprite(AquariumCreatureType::FastNPCreature)));
+            break;
+        case AquariumCreatureType::NewNemoCreature:
+            this->addCreature(std::make_shared<NewNemoCreature>(x, y, speed, this->m_sprite_manager->GetSprite(AquariumCreatureType::NewNemoCreature)));
             break;
         default:
             ofLogError() << "Unknown creature type to spawn!";
