@@ -10,8 +10,8 @@
 enum class AquariumCreatureType {
     NPCreature,
     BiggerFish,
-    FastNPCreature,
-    NewNemoCreature
+    FastNPCreature,   //added new fish species
+    NewNemoCreature   //added new fish species
 };
 
 string AquariumCreatureTypeToString(AquariumCreatureType t);

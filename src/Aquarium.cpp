@@ -9,9 +9,9 @@ string AquariumCreatureTypeToString(AquariumCreatureType t){
             return "BiggerFish";
         case AquariumCreatureType::NPCreature:
             return "BaseFish";
-        case AquariumCreatureType::FastNPCreature:
+        case AquariumCreatureType::FastNPCreature:      //added new fish species
             return "FastFish"; 
-        case AquariumCreatureType::NewNemoCreature:
+        case AquariumCreatureType::NewNemoCreature:     //added new fish species
             return "NewNemoFish";
         default:
             return "UknownFish";
@@ -111,7 +111,7 @@ FastNPCreature::FastNPCreature(float x, float y, int speed, std::shared_ptr<Game
 //Overide of move function in FastNPCreature class
 void NewNemoCreature::move() {
     m_x += m_dx * m_speed ;
-    m_y += sin(m_x * 0.06f) * 2.0f;
+    m_y += sin(m_x * 0.06f) * 4.0f;  //moves like the sine functions cause why not
     if(m_dx < 0 ){
         this->m_sprite->setFlipped(true);
     }else {
@@ -282,6 +282,7 @@ void Aquarium::SpawnCreature(AquariumCreatureType type) {
         case AquariumCreatureType::FastNPCreature:
             this->addCreature(std::make_shared<FastNPCreature>(x, y, speed, this->m_sprite_manager->GetSprite(AquariumCreatureType::FastNPCreature)));
             break;
+        //Added NewNemoCreature in creature spawning
         case AquariumCreatureType::NewNemoCreature:
             this->addCreature(std::make_shared<NewNemoCreature>(x, y, speed, this->m_sprite_manager->GetSprite(AquariumCreatureType::NewNemoCreature)));
             break;
