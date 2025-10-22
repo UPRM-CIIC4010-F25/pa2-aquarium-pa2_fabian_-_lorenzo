@@ -16,22 +16,29 @@ void Creature::bounce() {
     if(m_x < 0)
     {
         m_x = 0;
-        m_dx *= -1;
+        // m_speed != 5 is checked to differentiate the player from the NPCs
+        //      as the player has a default speed of 5 but the NPCs don't have
+        //      a default speed.
+        if (m_speed != 5)
+            m_dx *= -1;
     }
     if(m_x > m_width)
     {
         m_x = m_width;
-        m_dx *= -1;
+        if (m_speed != 5)
+            m_dx *= -1;
     }
     if(m_y < 0)
     {
         m_y = 0;
-        m_dy *= -1;
+        if (m_speed != 5)
+            m_dy *= -1;
     }
     if(m_y > m_height)
     {
         m_y = m_height;
-        m_dy *= -1;
+        if (m_speed != 5)
+            m_dy *= -1;
     }
 }
 

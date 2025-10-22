@@ -86,13 +86,6 @@ void ofApp::update(){
     }
 
     gameManager->UpdateActiveScene();
-    
-
-    // action upon collision
-    /* if (checkCollision())
-    {
-
-    } */
 }
 
 //--------------------------------------------------------------
