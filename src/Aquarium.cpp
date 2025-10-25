@@ -13,6 +13,8 @@ string AquariumCreatureTypeToString(AquariumCreatureType t){
             return "FastFish"; 
         case AquariumCreatureType::NewNemoCreature:     //added new fish species
             return "NewNemoFish";
+        case AquariumCreatureType::SharkCreature:       //added new fish species
+            return "SharkCreature";
         default:
             return "UknownFish";
     }
@@ -98,7 +100,7 @@ void NPCreature::move() {
     bounce();
 }
 
-//FastNPCreature constructor implementation
+//FastNPCreature class constructor implementation
 FastNPCreature::FastNPCreature(float x, float y, int speed, std::shared_ptr<GameSprite> sprite)
 : NPCreature(x, y, speed, sprite) {
     m_dx = (rand() % 3 - 1); // -1, 0, or 1
@@ -120,7 +122,7 @@ void NewNemoCreature::move() {
     bounce();
 }
 
-//Nemo constructor implementation
+//NemoClass constructor implementation
 NewNemoCreature::NewNemoCreature(float x, float y, int speed, std::shared_ptr<GameSprite> sprite)
 : NPCreature(x, y, speed, sprite) {
     m_dx = (rand() % 3 - 1); // -1, 0, or 1
@@ -134,6 +136,42 @@ NewNemoCreature::NewNemoCreature(float x, float y, int speed, std::shared_ptr<Ga
 void FastNPCreature::move() {
     m_x += m_dx * m_speed * 3;
     m_y += m_dy * m_speed * 3;
+    if(m_dx < 0 ){
+        this->m_sprite->setFlipped(true);
+    }else {
+        this->m_sprite->setFlipped(false);
+    }
+    bounce();
+}
+
+//SharkClass constructor implementation
+SharkCreature::SharkCreature(float x, float y, int speed, std::shared_ptr<GameSprite> sprite)
+: NPCreature(x, y, speed, sprite) {
+    m_dx = (rand() % 3 - 1); // -1, 0, or 1
+    m_dy = (rand() % 3 - 1); // -1, 0, or 1
+    normalize();
+
+    m_creatureType = AquariumCreatureType::SharkCreature;
+}
+
+//Override of move function in SharkCreature class
+void SharkCreature::move() {
+   //Fish starts with boost and rest. The boost first gets depleted and then we have rest
+   if(boostTimer > 0) {
+    m_x += m_dx * m_speed * 3;
+    m_y += m_dy * m_speed * 3;
+    boostTimer--;
+   } else if (restTimer > 0) {
+    m_x += m_dx * m_speed;
+    m_y += m_dy * m_speed;
+    restTimer--;
+    }
+    else {
+        //After rest and boost are finished, we set the timer for rest and boost to random to add suspense...
+        boostTimer = ofRandom(10,20);
+        restTimer = ofRandom(5,12);
+    }
+   
     if(m_dx < 0 ){
         this->m_sprite->setFlipped(true);
     }else {
@@ -188,7 +226,7 @@ AquariumSpriteManager::AquariumSpriteManager(){
     this->m_big_fish = std::make_shared<GameSprite>("bigger-fish.png", 120, 120);
     this->m_fast_fish = std::make_shared<GameSprite>("base-fish.2.png", 70, 70);
     this->m_nemo_fish = std::make_shared<GameSprite>("nemo_v2.png", 70, 70);
-    
+    this->m_shark_fish = std::make_shared<GameSprite>("shark.png", 120, 120);
 }
 
 std::shared_ptr<GameSprite> AquariumSpriteManager::GetSprite(AquariumCreatureType t){
@@ -204,6 +242,8 @@ std::shared_ptr<GameSprite> AquariumSpriteManager::GetSprite(AquariumCreatureTyp
 
         case AquariumCreatureType::NewNemoCreature:
             return std::make_shared<GameSprite>(*this->m_nemo_fish); //added nemo for further implementation
+        case AquariumCreatureType::SharkCreature:
+            return std::make_shared<GameSprite>(*this->m_shark_fish); //added nemo for further implementation
         default:
             return nullptr;
     }
@@ -285,6 +325,9 @@ void Aquarium::SpawnCreature(AquariumCreatureType type) {
         //Added NewNemoCreature in creature spawning
         case AquariumCreatureType::NewNemoCreature:
             this->addCreature(std::make_shared<NewNemoCreature>(x, y, speed, this->m_sprite_manager->GetSprite(AquariumCreatureType::NewNemoCreature)));
+            break;
+        case AquariumCreatureType::SharkCreature:
+            this->addCreature(std::make_shared<SharkCreature>(x, y, speed, this->m_sprite_manager->GetSprite(AquariumCreatureType::SharkCreature)));
             break;
         default:
             ofLogError() << "Unknown creature type to spawn!";
@@ -474,7 +517,7 @@ std::vector<AquariumCreatureType> Level_2::Repopulate() {
     return toRepopulate;
 }
 
-
+//Added repopulate for new levels, level 3
 std::vector<AquariumCreatureType> Level_3::Repopulate() {
     std::vector<AquariumCreatureType> toRepopulate;
     for(std::shared_ptr<AquariumLevelPopulationNode> node : this->m_levelPopulation){
@@ -489,7 +532,7 @@ std::vector<AquariumCreatureType> Level_3::Repopulate() {
     return toRepopulate;
 }
 
-
+//Added repopulate for new levels, level 4
 std::vector<AquariumCreatureType> Level_4::Repopulate() {
     std::vector<AquariumCreatureType> toRepopulate;
     for(std::shared_ptr<AquariumLevelPopulationNode> node : this->m_levelPopulation){
