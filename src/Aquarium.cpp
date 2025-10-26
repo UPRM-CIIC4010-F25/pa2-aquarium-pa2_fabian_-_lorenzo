@@ -125,8 +125,8 @@ void NewNemoCreature::move() {
 //NemoClass constructor implementation
 NewNemoCreature::NewNemoCreature(float x, float y, int speed, std::shared_ptr<GameSprite> sprite)
 : NPCreature(x, y, speed, sprite) {
-    m_dx = (rand() % 3 - 1); // -1, 0, or 1
-    m_dy = (rand() % 3 - 1); // -1, 0, or 1
+    m_dx = 1; 
+    m_dy = 1; 
     normalize();
 
     m_creatureType = AquariumCreatureType::NewNemoCreature;
