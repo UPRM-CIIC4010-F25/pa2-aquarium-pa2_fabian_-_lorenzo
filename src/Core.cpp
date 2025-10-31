@@ -1,8 +1,13 @@
 #include "Core.h"
 
 
+// Sets bounds: inherited powerup subclasses
+void PowerUp::setBounds(int w, int h) { m_width = w; m_height = h; }
+
 // Creature Inherited Base Behavior
 void Creature::setBounds(int w, int h) { m_width = w; m_height = h; }
+
+
 void Creature::normalize() {
     float length = std::sqrt(m_dx * m_dx + m_dy * m_dy);
     if (length != 0) {
@@ -16,9 +21,9 @@ void Creature::bounce() {
     if(m_x < 0)
     {
         m_x = 0;
-        // m_speed != 5 is checked to differentiate the player from the NPCs
-        //      as the player has a default speed of 5 but the NPCs don't have
-        //      a default speed.
+        // m_speed != 5 is checked to differentiate the player from most NPCs
+        //      as the player has a default speed of 5 but most NPCs don't, and
+        //      they should not behave in the same manner
         if (m_speed != 5)
             m_dx *= -1;
     }
@@ -81,6 +86,7 @@ bool checkCollision(std::shared_ptr<Creature> a, std::shared_ptr<Creature> b) {
         
     return false; 
 };
+
 
 
 string GameSceneKindToString(GameSceneKind t){
