@@ -3,6 +3,8 @@
 #include <cmath>
 
 
+
+
 string AquariumCreatureTypeToString(AquariumCreatureType t){
     switch(t){
         case AquariumCreatureType::BiggerFish:
@@ -64,6 +66,11 @@ void PlayerCreature::draw() const {
 
 void PlayerCreature::changeSpeed(int speed) {
     m_speed = speed;
+}
+
+// Give a player an extra live
+void PlayerCreature::gainLive(){
+    m_lives++;
 }
 
 void PlayerCreature::loseLife(int debounce) {
@@ -220,6 +227,7 @@ void BiggerFish::draw() const {
 }
 
 
+
 // AquariumSpriteManager
 AquariumSpriteManager::AquariumSpriteManager(){
     this->m_npc_fish = std::make_shared<GameSprite>("base-fish.png", 70,70);
@@ -227,6 +235,98 @@ AquariumSpriteManager::AquariumSpriteManager(){
     this->m_fast_fish = std::make_shared<GameSprite>("base-fish.2.png", 70, 70);
     this->m_nemo_fish = std::make_shared<GameSprite>("nemo_v2.png", 70, 70);
     this->m_shark_fish = std::make_shared<GameSprite>("shark.png", 120, 120);
+    // Determines the health powerup's visual
+    this->m_health_power = std::make_shared<GameSprite>("health-power.png", 50, 50);
+}
+
+
+void PowerUp::draw() const{
+    if(m_sprite)
+        m_sprite->draw(m_x,m_y);
+}
+
+// Health powerup implementation
+HealthPowerUp::HealthPowerUp(float x, float y, std::shared_ptr<GameSprite> sprite)
+    : PowerUp(x, y, sprite){
+        setCollisionRadius(30);
+        setPowerUpType(PowerUpType::Health);
+    }
+
+void HealthPowerUp::draw() const{
+    if (m_sprite) {
+        m_sprite->draw(m_x, m_y);
+    }
+}
+
+// GetSprite specifically for powerups
+std::shared_ptr<GameSprite> AquariumSpriteManager::GetSprite(PowerUpType t){
+    switch(t){
+        case PowerUpType::Health:
+            return std::make_shared<GameSprite>(*this->m_health_power);
+        default:
+            return nullptr;
+    }
+}
+
+// Set position and gets sprite of corresponding powerup
+void Aquarium::SpawnPowerUp(PowerUpType type){
+    int x = rand() % this->getWidth();
+    int y = rand() % this->getHeight();
+    switch(type){
+        case PowerUpType::Health:
+            this->addPowerUp(std::make_shared<HealthPowerUp>(x,y,this->m_sprite_manager->GetSprite(PowerUpType::Health)));
+            break;
+        default:
+            ofLogError() << "Unknown powerup type to spawn!";
+            break;
+    }
+} 
+
+//  Sets powerup bounds and places them in a vector
+void Aquarium::addPowerUp(std::shared_ptr<PowerUp> power) {
+    power->setBounds(m_width - 20, m_height - 20);
+    m_power_ups.push_back(power);
+}
+
+
+
+bool checkPowerUpCollisions(std::shared_ptr<PlayerCreature> a, std::shared_ptr<PowerUp> b){
+    double distance = sqrt(pow(a->getX()-b->getX(),2.0) + pow(a->getY()-b->getY(),2.0));
+    if(distance < a->getCollisionRadius() || distance < b->getCollisionRadius())
+        return true;
+        
+    return false;
+}
+
+std::shared_ptr<PowerUp> Aquarium::getPowerUpAt(int index){
+    if (index < 0 || size_t(index) >= m_power_ups.size()) {
+        return nullptr;
+    }
+    return m_power_ups[index];
+}
+
+// Power Up collision/pick-up detection
+std::shared_ptr<GameEvent> DetectPowerUpCollisions(std::shared_ptr<Aquarium> aquarium, std::shared_ptr<PlayerCreature> player) {
+    if (!aquarium || !player) return nullptr;
+    
+    for (int i = 0; i < aquarium->getPowerUpCount(); ++i) {
+        std::shared_ptr<PowerUp> power = aquarium->getPowerUpAt(i);
+        if (power && checkPowerUpCollisions(player, power)) {
+            return std::make_shared<GameEvent>(GameEventType::POWERUP, power, player);
+        }
+    }
+    return nullptr;
+};
+
+//  Returns true if level score is greater or equal than powerup target score
+bool AquariumLevel::canSpawnPowerUp(){
+    return this->m_level_score >= this->m_power_up_score;
+}
+
+
+// clear powerup vector
+void Aquarium::clearPowerUps(){
+    m_power_ups.clear();
 }
 
 std::shared_ptr<GameSprite> AquariumSpriteManager::GetSprite(AquariumCreatureType t){
@@ -250,6 +350,8 @@ std::shared_ptr<GameSprite> AquariumSpriteManager::GetSprite(AquariumCreatureTyp
 }
 
 
+
+
 // Aquarium Implementation
 Aquarium::Aquarium(int width, int height, std::shared_ptr<AquariumSpriteManager> spriteManager)
     : m_width(width), m_height(height) {
@@ -262,6 +364,7 @@ void Aquarium::addCreature(std::shared_ptr<Creature> creature) {
     creature->setBounds(m_width - 20, m_height - 20);
     m_creatures.push_back(creature);
 }
+
 
 void Aquarium::addAquariumLevel(std::shared_ptr<AquariumLevel> level){
     if(level == nullptr){return;} // guard to not add noise
@@ -278,6 +381,12 @@ void Aquarium::update() {
 void Aquarium::draw() const {
     for (const auto& creature : m_creatures) {
         creature->draw();
+    }
+    // Draws power up if target score is reached and power up is hasn't been picked up yet
+    if(this->m_canCollidePowerUp){
+        for (const auto& power : m_power_ups) {
+            power->draw();
+        }
     }
 }
 
@@ -303,6 +412,7 @@ std::shared_ptr<Creature> Aquarium::getCreatureAt(int index) {
     }
     return m_creatures[index];
 }
+
 
 
 
@@ -337,6 +447,8 @@ void Aquarium::SpawnCreature(AquariumCreatureType type) {
 }
 
 
+
+
 // repopulation will be called from the levl class
 // it will compose into aquarium so eating eats frm the pool of NPCs in the lvl class
 // once lvl criteria met, we move to new lvl through inner signal asking for new lvl
@@ -348,6 +460,12 @@ void Aquarium::Repopulate() {
     ofLogVerbose() << "the current index: " << selectedLevelIdx << endl;
     std::shared_ptr<AquariumLevel> level = this->m_aquariumlevels.at(selectedLevelIdx);
 
+    // Spawns powerup and allows collision/pickup if conditions are met
+    if(level->canSpawnPowerUp()){
+        this->SpawnPowerUp(PowerUpType::Health);
+        level->setPowerUpScore(1000);       // ensures power ups aren't spawned infinitely by not letting
+        this->setCanCollidePowerUp(true);   // canSpawnPowerUp() return true indefinetly as level score isn't
+    }                                       //  reset to 0 here
 
     if(level->isCompleted()){
         level->levelReset();
@@ -356,6 +474,8 @@ void Aquarium::Repopulate() {
         ofLogNotice()<<"new level reached : " << selectedLevelIdx << std::endl;
         level = this->m_aquariumlevels.at(selectedLevelIdx);
         this->clearCreatures();
+        this->setCanCollidePowerUp(false);
+        this->clearPowerUps();
     }
 
     
@@ -382,12 +502,14 @@ std::shared_ptr<GameEvent> DetectAquariumCollisions(std::shared_ptr<Aquarium> aq
     return nullptr;
 };
 
+
 //  Imlementation of the AquariumScene
 
 void AquariumGameScene::Update(){
     std::shared_ptr<GameEvent> event;
 
     this->m_player->update();
+    
 
     if (this->updateControl.tick()) {
         event = DetectAquariumCollisions(this->m_aquarium, this->m_player);
@@ -419,7 +541,27 @@ void AquariumGameScene::Update(){
                 ofLogError() << "Error: creatureB is null in collision event." << std::endl;
             }
         }
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // Responsible for registering collisions, applying powerup effect, and handling if a powerup
+        // can be collided with or picked up
+        if (this->m_aquarium->getCanCollidePowerUp()) {
+            event = DetectPowerUpCollisions(this->m_aquarium, this->m_player);
+            if (event != nullptr && event->isPowerUpEvent()){
+                PowerUpType type = event->powerUp->getPowerUpType();
+                switch(type){
+                    case PowerUpType::Health:
+                        m_player->gainLive();
+                        //ofLogNotice() << "Gained live!" << std::endl;
+                        break;
+                    default:
+                        ofLogNotice()<< "Could not identify type" << std::endl;
+                        break;
+                }
+                this->m_aquarium->setCanCollidePowerUp(false);
+            }
+        }
         this->m_aquarium->update();
+
     }
 
 }
@@ -469,7 +611,6 @@ void AquariumLevel::ConsumePopulation(AquariumCreatureType creatureType, int pow
 bool AquariumLevel::isCompleted(){
     return this->m_level_score >= this->m_targetScore;
 }
-
 
 
 

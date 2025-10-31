@@ -102,10 +102,51 @@ public:
     void bounce();
 };
 
+// Added enum for all powerup types
+enum class PowerUpType{
+    Health
+};
+
+
+// Making PowerUp class
+class PowerUp{
+protected:
+    PowerUp(float x, float y, std::shared_ptr<GameSprite> sprite)
+    : m_x(x)
+    , m_y(y)
+    , m_width(0)
+    , m_height(0)
+    , m_sprite(std::move(sprite)) {}
+
+    float m_x = 0.0f;
+    float m_y = 0.0f;
+    float m_width = 0.0f;
+    float m_height = 0.0f;
+    float m_collisionRadius = 0.0f;
+    std::shared_ptr<GameSprite> m_sprite;
+
+    PowerUpType m_power_upType;
+    
+
+public:
+    virtual ~PowerUp() = default;
+    virtual void draw() const /*= 0*/;
+    void setBounds(int w, int h);
+    float getX() {return this->m_x;}
+    float getY() {return this->m_y;}
+    virtual float getCollisionRadius() {return this->m_collisionRadius;}
+    virtual void setCollisionRadius(float radius) { m_collisionRadius = radius; }
+    virtual PowerUpType getPowerUpType() { return this->m_power_upType; }
+    virtual void setPowerUpType(PowerUpType type) { this->m_power_upType = type; }
+
+};
+
+
 // GameEvents
 enum class GameEventType {
     NONE,
     COLLISION,
+    POWERUP,            // New event: POWERUP
     CREATURE_ADDED,
     CREATURE_REMOVED,
     GAME_OVER,
@@ -116,17 +157,26 @@ enum class GameEventType {
 class GameEvent {
     public:
     GameEventType type;
-    std::shared_ptr<Creature> creatureA;
-    std::shared_ptr<Creature> creatureB; // For collision events
+    std::shared_ptr<Creature> creatureA;    // player
+    std::shared_ptr<Creature> creatureB; // For collision events; npc
     GameEvent() : type(GameEventType::NONE), creatureA(nullptr), creatureB(nullptr) {}
     GameEvent(GameEventType t, std::shared_ptr<Creature> a , std::shared_ptr<Creature> b){
         type = t;
         creatureA = a;
         creatureB = b;
     }
+    // Collision events with powerups
+    std::shared_ptr<PowerUp> powerUp;   
+    GameEvent(GameEventType t, std::shared_ptr<PowerUp> b, std::shared_ptr<Creature> a){
+        type = t;
+        creatureA = a;
+        powerUp = b;
+    }
+
     
     // Additional methods can be added here
     bool isCollisionEvent() const { return type == GameEventType::COLLISION; }
+    bool isPowerUpEvent() const { return type == GameEventType::POWERUP; }
     bool isCreatureAddedEvent() const { return type == GameEventType::CREATURE_ADDED; }
     bool isCreatureRemovedEvent() const { return type == GameEventType::CREATURE_REMOVED; }
     bool isGameOver() const { return type == GameEventType::GAME_OVER; }
@@ -138,8 +188,6 @@ class GameEvent {
 };
 
 
-
-
 bool checkCollision(std::shared_ptr<Creature> a, std::shared_ptr<Creature> b);
 
 
@@ -149,6 +197,8 @@ public:
     virtual ~GameLevel() = default;
     int getLevelNumber() const { return m_levelNumber; }
     virtual bool isCompleted() = 0;
+    // Indicate when a powerup can spawn
+    virtual bool canSpawnPowerUp() = 0;
 
 protected:
     int m_levelNumber;

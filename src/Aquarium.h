@@ -15,6 +15,18 @@ enum class AquariumCreatureType {
     SharkCreature      //added final new fish species
 };
 
+
+
+// Health power up subclass
+class HealthPowerUp : public PowerUp{
+public:
+    HealthPowerUp(float x, float y, std::shared_ptr<GameSprite> sprite);
+    PowerUpType getType() {return this->m_power_upType;}
+    void draw() const override;
+}; 
+
+
+
 string AquariumCreatureTypeToString(AquariumCreatureType t);
 
 class AquariumLevelPopulationNode{
@@ -32,23 +44,29 @@ class AquariumLevelPopulationNode{
 
 class AquariumLevel : public GameLevel {
     public:
-        AquariumLevel(int levelNumber, int targetScore)
-        : GameLevel(levelNumber), m_level_score(0), m_targetScore(targetScore){};
+    // Added a powerup target score as a parameter for the class and its parametrized constructor
+        AquariumLevel(int levelNumber, int targetScore, int powerUpScore)
+        : GameLevel(levelNumber), m_level_score(0), m_targetScore(targetScore), m_power_up_score(powerUpScore) {};
         void ConsumePopulation(AquariumCreatureType creature, int power);
         bool isCompleted() override;
         void populationReset();
         void levelReset(){m_level_score=0;this->populationReset();}
         virtual std::vector<AquariumCreatureType> Repopulate() = 0;
+        // powerup functions
+        bool canSpawnPowerUp() override;
+        void setPowerUpScore(int score) { m_power_up_score = score; }
     protected:
         std::vector<std::shared_ptr<AquariumLevelPopulationNode>> m_levelPopulation;
         int m_level_score;
         int m_targetScore;
+        int m_power_up_score;
 
 };
 
 
 class PlayerCreature : public Creature {
 public:
+    double deltaTime = 0;
 
     PlayerCreature(float x, float y, int speed, std::shared_ptr<GameSprite> sprite);
     void move();
@@ -67,6 +85,7 @@ public:
     int getPower() const { return m_power; }
     
     void addToScore(int amount, int weight=1) { m_score += amount * weight; }
+    void gainLive();
     void loseLife(int debounce);
     void increasePower(int value) { m_power += value; }
     void reduceDamageDebounce();
@@ -125,12 +144,15 @@ class AquariumSpriteManager {
         AquariumSpriteManager();
         ~AquariumSpriteManager() = default;
         std::shared_ptr<GameSprite>GetSprite(AquariumCreatureType t);
+        // Added powerup sprite getter and parameters
+        std::shared_ptr<GameSprite>GetSprite(PowerUpType t);
     private:
         std::shared_ptr<GameSprite> m_npc_fish;
         std::shared_ptr<GameSprite> m_big_fish;
         std::shared_ptr<GameSprite> m_fast_fish; //added new fist species for future implementation
         std::shared_ptr<GameSprite> m_nemo_fish;  //added new fist species for future implementation
         std::shared_ptr<GameSprite> m_shark_fish;  //added new fist species for future implementation
+        std::shared_ptr<GameSprite> m_health_power; // health powerup sprite
 };
 
 
@@ -147,6 +169,14 @@ public:
     void setMaxPopulation(int n) { m_maxPopulation = n; }
     void Repopulate();
     void SpawnCreature(AquariumCreatureType type);
+    // powerup functions
+    void addPowerUp(std::shared_ptr<PowerUp> power);
+    void SpawnPowerUp(PowerUpType type);
+    int getPowerUpCount() const { return m_power_ups.size();}
+    bool getCanCollidePowerUp() { return m_canCollidePowerUp; }
+    void setCanCollidePowerUp(bool canCollide) { m_canCollidePowerUp = canCollide;}
+    void clearPowerUps();
+    std::shared_ptr<PowerUp> getPowerUpAt(int index);
     
     std::shared_ptr<Creature> getCreatureAt(int index);
     int getCreatureCount() const { return m_creatures.size(); }
@@ -163,7 +193,13 @@ private:
     std::vector<std::shared_ptr<Creature>> m_next_creatures;
     std::vector<std::shared_ptr<AquariumLevel>> m_aquariumlevels;
     std::shared_ptr<AquariumSpriteManager> m_sprite_manager;
+    // powerup properties
+    bool m_canCollidePowerUp;
+    std::vector<std::shared_ptr<PowerUp>> m_power_ups;
 };
+
+// function to determine when the player picks up a powerup
+std::shared_ptr<GameEvent> DetectPowerUpCollisions(std::shared_ptr<Aquarium> aquarium, std::shared_ptr<PlayerCreature> player);
 
 
 std::shared_ptr<GameEvent> DetectAquariumCollisions(std::shared_ptr<Aquarium> aquarium, std::shared_ptr<PlayerCreature> player);
@@ -190,9 +226,10 @@ class AquariumGameScene : public GameScene {
 };
 
 //Added new fish species in order for it to be rendered accordingly to the level
+//  Added a powerup target score paramater for all levels
 class Level_0 : public AquariumLevel  {
     public:
-        Level_0(int levelNumber, int targetScore): AquariumLevel(levelNumber, targetScore){
+        Level_0(int levelNumber, int targetScore, int powerUpScore): AquariumLevel(levelNumber, targetScore, powerUpScore){
             this->m_levelPopulation.push_back(std::make_shared<AquariumLevelPopulationNode>(AquariumCreatureType::NPCreature, 8));
             this->m_levelPopulation.push_back(std::make_shared<AquariumLevelPopulationNode>(AquariumCreatureType::NewNemoCreature, 4));
         };
@@ -201,7 +238,7 @@ class Level_0 : public AquariumLevel  {
 };
 class Level_1 : public AquariumLevel  {
     public:
-        Level_1(int levelNumber, int targetScore): AquariumLevel(levelNumber, targetScore){
+        Level_1(int levelNumber, int targetScore, int powerUpScore): AquariumLevel(levelNumber, targetScore, powerUpScore){
             this->m_levelPopulation.push_back(std::make_shared<AquariumLevelPopulationNode>(AquariumCreatureType::NPCreature, 12));
             this->m_levelPopulation.push_back(std::make_shared<AquariumLevelPopulationNode>(AquariumCreatureType::NewNemoCreature, 6));
             this->m_levelPopulation.push_back(std::make_shared<AquariumLevelPopulationNode>(AquariumCreatureType::FastNPCreature, 6));
@@ -213,7 +250,7 @@ class Level_1 : public AquariumLevel  {
 };
 class Level_2 : public AquariumLevel  {
     public:
-        Level_2(int levelNumber, int targetScore): AquariumLevel(levelNumber, targetScore){
+        Level_2(int levelNumber, int targetScore, int powerUpScore): AquariumLevel(levelNumber, targetScore, powerUpScore){
             this->m_levelPopulation.push_back(std::make_shared<AquariumLevelPopulationNode>(AquariumCreatureType::NPCreature, 30));
             this->m_levelPopulation.push_back(std::make_shared<AquariumLevelPopulationNode>(AquariumCreatureType::BiggerFish, 2));
             this->m_levelPopulation.push_back(std::make_shared<AquariumLevelPopulationNode>(AquariumCreatureType::FastNPCreature, 8));
@@ -226,7 +263,7 @@ class Level_2 : public AquariumLevel  {
 //New level 3 with its respective fish implemented
 class Level_3 : public AquariumLevel {
     public:
-    Level_3(int levelNumber, int targetScore): AquariumLevel(levelNumber, targetScore){
+    Level_3(int levelNumber, int targetScore, int powerUpScore): AquariumLevel(levelNumber, targetScore, powerUpScore){
             this->m_levelPopulation.push_back(std::make_shared<AquariumLevelPopulationNode>(AquariumCreatureType::BiggerFish, 20));
             this->m_levelPopulation.push_back(std::make_shared<AquariumLevelPopulationNode>(AquariumCreatureType::FastNPCreature, 20));
             this->m_levelPopulation.push_back(std::make_shared<AquariumLevelPopulationNode>(AquariumCreatureType::SharkCreature, 6));
@@ -238,7 +275,7 @@ class Level_3 : public AquariumLevel {
 //New level 3 with its respective fish implemented
 class Level_4 : public AquariumLevel {
 public:
-    Level_4(int levelNumber, int targetScore): AquariumLevel(levelNumber, targetScore){
+    Level_4(int levelNumber, int targetScore, int powerUpScore): AquariumLevel(levelNumber, targetScore, powerUpScore){
             this->m_levelPopulation.push_back(std::make_shared<AquariumLevelPopulationNode>(AquariumCreatureType::BiggerFish, 5));
             this->m_levelPopulation.push_back(std::make_shared<AquariumLevelPopulationNode>(AquariumCreatureType::FastNPCreature, 5));
              this->m_levelPopulation.push_back(std::make_shared<AquariumLevelPopulationNode>(AquariumCreatureType::SharkCreature, 15));
