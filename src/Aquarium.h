@@ -232,6 +232,7 @@ class AquariumGameScene : public GameScene {
 class Level_0 : public AquariumLevel  {
     public:
         Level_0(int levelNumber, int targetScore, int powerUpScore): AquariumLevel(levelNumber, targetScore, powerUpScore){
+            this->m_levelPopulation.push_back(std::make_shared<AquariumLevelPopulationNode>(AquariumCreatureType::SharkCreature, 6));
             this->m_levelPopulation.push_back(std::make_shared<AquariumLevelPopulationNode>(AquariumCreatureType::NPCreature, 8));
             this->m_levelPopulation.push_back(std::make_shared<AquariumLevelPopulationNode>(AquariumCreatureType::NewNemoCreature, 4));
         };
@@ -246,7 +247,7 @@ class Level_1 : public AquariumLevel  {
             this->m_levelPopulation.push_back(std::make_shared<AquariumLevelPopulationNode>(AquariumCreatureType::FastNPCreature, 6));
             
         };
-        // std::vector<AquariumCreatureType> Repopulate() override;
+
 
 
 };
@@ -259,7 +260,7 @@ class Level_2 : public AquariumLevel  {
             
 
         };
-        // std::vector<AquariumCreatureType> Repopulate() override;
+
 
 };
 //New level 3 with its respective fish implemented
@@ -271,7 +272,7 @@ class Level_3 : public AquariumLevel {
             this->m_levelPopulation.push_back(std::make_shared<AquariumLevelPopulationNode>(AquariumCreatureType::SharkCreature, 6));
             
         };
-        // std::vector<AquariumCreatureType> Repopulate() override;
+
 
 };
 //New level 3 with its respective fish implemented
@@ -282,6 +283,6 @@ public:
             this->m_levelPopulation.push_back(std::make_shared<AquariumLevelPopulationNode>(AquariumCreatureType::FastNPCreature, 5));
              this->m_levelPopulation.push_back(std::make_shared<AquariumLevelPopulationNode>(AquariumCreatureType::SharkCreature, 15));
         };
-        // std::vector<AquariumCreatureType> Repopulate() override;
+
 
 };

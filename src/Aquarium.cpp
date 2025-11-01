@@ -234,7 +234,7 @@ AquariumSpriteManager::AquariumSpriteManager(){
     this->m_big_fish = std::make_shared<GameSprite>("bigger-fish.png", 120, 120);
     this->m_fast_fish = std::make_shared<GameSprite>("base-fish.2.png", 70, 70);
     this->m_nemo_fish = std::make_shared<GameSprite>("nemo_v2.png", 70, 70);
-    this->m_shark_fish = std::make_shared<GameSprite>("shark.png", 120, 120);
+    this->m_shark_fish = std::make_shared<GameSprite>("shark.png", 150, 50);
     // Determines the health powerup's visual
     this->m_health_power = std::make_shared<GameSprite>("health-power.png", 50, 50);
 }
@@ -629,76 +629,4 @@ bool AquariumLevel::isCompleted(){
 
 
 
-// std::vector<AquariumCreatureType> Level_0::Repopulate() {
-//     std::vector<AquariumCreatureType> toRepopulate;
-//     for(std::shared_ptr<AquariumLevelPopulationNode> node : this->m_levelPopulation){
-//         int delta = node->population - node->currentPopulation;
-//         ofLogVerbose() << "to Repopulate :  " << delta << endl;
-//         if(delta >0){
-//             for(int i = 0; i<delta; i++){
-//                 toRepopulate.push_back(node->creatureType);
-//             }
-//             node->currentPopulation += delta;
-//         }
-//     }
-//     return toRepopulate;
 
-// }
-
-// std::vector<AquariumCreatureType> Level_1::Repopulate() {
-//     std::vector<AquariumCreatureType> toRepopulate;
-//     for(std::shared_ptr<AquariumLevelPopulationNode> node : this->m_levelPopulation){
-//         int delta = node->population - node->currentPopulation;
-//         if(delta >0){
-//             for(int i=0; i<delta; i++){
-//                 toRepopulate.push_back(node->creatureType);
-//             }
-//             node->currentPopulation += delta;
-//         }
-//     }
-//     return toRepopulate;
-// }
-
-// std::vector<AquariumCreatureType> Level_2::Repopulate() {
-//     std::vector<AquariumCreatureType> toRepopulate;
-//     for(std::shared_ptr<AquariumLevelPopulationNode> node : this->m_levelPopulation){
-//         int delta = node->population - node->currentPopulation;
-//         if(delta >0){
-//             for(int i=0; i<delta; i++){
-//                 toRepopulate.push_back(node->creatureType);
-//             }
-//             node->currentPopulation += delta;
-//         }
-//     }
-//     return toRepopulate;
-// }
-
-// //Added repopulate for new levels, level 3
-// std::vector<AquariumCreatureType> Level_3::Repopulate() {
-//     std::vector<AquariumCreatureType> toRepopulate;
-//     for(std::shared_ptr<AquariumLevelPopulationNode> node : this->m_levelPopulation){
-//         int delta = node->population - node->currentPopulation;
-//         if(delta >0){
-//             for(int i=0; i<delta; i++){
-//                 toRepopulate.push_back(node->creatureType);
-//             }
-//             node->currentPopulation += delta;
-//         }
-//     }
-//     return toRepopulate;
-// }
-
-// //Added repopulate for new levels, level 4
-// std::vector<AquariumCreatureType> Level_4::Repopulate() {
-//     std::vector<AquariumCreatureType> toRepopulate;
-//     for(std::shared_ptr<AquariumLevelPopulationNode> node : this->m_levelPopulation){
-//         int delta = node->population - node->currentPopulation;
-//         if(delta >0){
-//             for(int i=0; i<delta; i++){
-//                 toRepopulate.push_back(node->creatureType);
-//             }
-//             node->currentPopulation += delta;
-//         }
-//     }
-//     return toRepopulate;
-// }
