@@ -57,6 +57,7 @@ class AquariumLevel : public GameLevel {
         // powerup functions
         bool canSpawnPowerUp() override;
         void setPowerUpScore(int score) { m_power_up_score = score; }
+        int getPowerUpScore() { return this->m_power_up_score; }
     protected:
         std::vector<std::shared_ptr<AquariumLevelPopulationNode>> m_levelPopulation;
         int m_level_score;
