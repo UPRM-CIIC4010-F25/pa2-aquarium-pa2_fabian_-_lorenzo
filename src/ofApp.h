@@ -41,5 +41,9 @@ class ofApp : public ofBaseApp{
 
 		std::unique_ptr<GameSceneManager> gameManager;
 		std::shared_ptr<AquariumSpriteManager>spriteManager;
+
+		bool musicChanged = false; //Flag that will allow to change music in the future
+
+		float musicTimer = 0.0f;  //Timer that will be needed to change son after x amount of time passed
 		
 };
