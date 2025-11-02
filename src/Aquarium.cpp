@@ -478,12 +478,13 @@ void Aquarium::Repopulate() {
     // Spawns powerup and allows collision/pickup if conditions are met
     if(level->canSpawnPowerUp()){
         this->SpawnPowerUp(PowerUpType::Health);
-        level->setPowerUpScore(1000);       // ensures power ups aren't spawned infinitely by not letting
-        this->setCanCollidePowerUp(true);   // canSpawnPowerUp() return true indefinetly as level score isn't
-    }                                       //  reset to 0 here
+        level->setPowerUpScore(level->getPowerUpScore()*3); // ensures power ups aren't spawned infinitely by not letting
+        this->setCanCollidePowerUp(true);                   // canSpawnPowerUp() return true indefinetly since level score isn't
+    }                                                       //  reset to 0 here
 
     if(level->isCompleted()){
         level->levelReset();
+        level->setPowerUpScore(level->getPowerUpScore()/3); // Resets powerup target score to its intended value
         this->currentLevel += 1;
         selectedLevelIdx = this->currentLevel % this->m_aquariumlevels.size();
         ofLogNotice()<<"new level reached : " << selectedLevelIdx << std::endl;
