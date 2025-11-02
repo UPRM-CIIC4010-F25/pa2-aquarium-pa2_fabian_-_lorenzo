@@ -34,8 +34,14 @@ void PlayerCreature::setDirection(float dx, float dy) {
 }
 
 void PlayerCreature::move() {
-    m_x += m_dx * m_speed;
+    m_x += m_dx * m_speed ;
     m_y += m_dy * m_speed;
+
+    //Needed so fish doesn't move alone with no input is given
+    if(m_dx != 0) {
+        //Player fish will now move as a real fish cause why not....
+        m_y += sin(m_x * 0.06f) * 4.0f;
+    }
     this->bounce();
 }
 
