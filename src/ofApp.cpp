@@ -72,7 +72,8 @@ void ofApp::setup(){
 
 //--------------------------------------------------------------
 void ofApp::update(){
-    
+    if(pausePressed && gameManager->GetActiveSceneName() == GameSceneKindToString(GameSceneKind::AQUARIUM_GAME)) return;
+
     if(gameManager->GetActiveSceneName() == GameSceneKindToString(GameSceneKind::GAME_OVER)){
         if(gameMusic.isPlaying()) {
             gameMusic.stop();
@@ -114,6 +115,30 @@ void ofApp::update(){
 void ofApp::draw(){
     backgroundImage.draw(0, 0);
     gameManager->DrawActiveScene();
+
+    //If flag is true the instructions text will appear if in game mode
+    //Once in pause state, literally everything is paused
+    if(helpedPressed && gameManager->GetActiveSceneName() == GameSceneKindToString(GameSceneKind::AQUARIUM_GAME) && !pausePressed) {
+        ofDrawBitmapString("Use the arrow keys to move your fish around!", 5, 20);  //Added instructions in overlay to improve user experience
+        ofDrawBitmapString("PowerUps might appear at some points...", 5, 30);
+    
+    //Needed so that text would only appear when the instructions text is not present and within the actual game, not intro
+    } else if(!helpedPressed && gameManager->GetActiveSceneName() == GameSceneKindToString(GameSceneKind::AQUARIUM_GAME) && !pausePressed) {
+        ofDrawBitmapString("Press H to obtain help!!", 5, 20);
+    }
+    //Since in pause state everything stops, no help is available to make things, more interesting....
+    else if(gameManager->GetActiveSceneName() == GameSceneKindToString(GameSceneKind::AQUARIUM_GAME) && pausePressed) {
+        ofDrawBitmapString("Help not available. No advantages here...", 5, 20);
+    }
+    //If flag is true and within game mode, the pause text will appear
+    if(pausePressed && gameManager->GetActiveSceneName() == GameSceneKindToString(GameSceneKind::AQUARIUM_GAME)) {
+        ofDrawBitmapString("Press P to unpause game!", 5, 50);
+        ofDrawBitmapString("You can now breathe...", 5, 60);
+    }
+    //If flag is false and within game mode, the pause text will change and extra text will be gone... (maybe forever)
+    else if(!pausePressed && gameManager->GetActiveSceneName() == GameSceneKindToString(GameSceneKind::AQUARIUM_GAME)) {
+        ofDrawBitmapString("Press P to pause game!", 5, 50);
+    }
 }
 
 //--------------------------------------------------------------
@@ -127,7 +152,8 @@ void ofApp::keyPressed(int key){
         ofLogNotice() << "Game has ended. Press ESC to exit." << std::endl;
         return; // Ignore other keys after game over
     }
-    if(gameManager->GetActiveSceneName() == GameSceneKindToString(GameSceneKind::AQUARIUM_GAME)){
+    //Added pausePressed condition if not player could move under pause conditions and no cheating!!!
+    if(gameManager->GetActiveSceneName() == GameSceneKindToString(GameSceneKind::AQUARIUM_GAME) && !pausePressed){
         auto gameScene = std::static_pointer_cast<AquariumGameScene>(gameManager->GetActiveScene());
         switch(key){
             case OF_KEY_UP:
@@ -147,9 +173,12 @@ void ofApp::keyPressed(int key){
             default:
                 break;
         }
-    
-        
-    
+
+        //Player must keep key pressed to see instructions text
+        if(key == 'h' || key == 'H') {
+            helpedPressed = true;
+        }
+
         gameScene->GetPlayer()->move();
         return;
 
@@ -186,6 +215,15 @@ void ofApp::keyReleased(int key){
         gameScene->GetPlayer()->setDirection(0, gameScene->GetPlayer()->isYDirectionActive()?gameScene->GetPlayer()->getDy():0);
         gameScene->GetPlayer()->move();
         return;
+    }
+    //Once player releases key, text will dissapear to make the game more visable and not have a lot of text
+    if(key == 'H' || key == 'h') {
+        helpedPressed = false;
+    }
+
+    //If player presses key once the pause state is activated
+    if(key == 'P' || key == 'p') {
+    pausePressed = !pausePressed;
     }
 
     }

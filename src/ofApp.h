@@ -45,5 +45,10 @@ class ofApp : public ofBaseApp{
 		bool musicChanged = false; //Flag that will allow to change music in the future
 
 		float musicTimer = 0.0f;  //Timer that will be needed to change son after x amount of time passed
+
+		bool helpedPressed = false;  //Flag that will allow to detect if user asks for help
+
+		bool pausePressed = false;  //Flag that will help activate pause state
+									//Since pause state is the same, decided to use a flag instead of declaring a new state....
 		
 };

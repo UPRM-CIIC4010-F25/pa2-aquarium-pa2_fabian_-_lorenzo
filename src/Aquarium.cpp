@@ -592,6 +592,8 @@ void AquariumGameScene::Draw() {
 
 void AquariumGameScene::paintAquariumHUD(){
     float panelWidth = ofGetWindowWidth() - 150;
+    // ofDrawBitmapString("Use the arrow keys to move your fish around!", 5, 20);  //Added instructions in overlay to improve user experience
+    // ofDrawBitmapString("PowerUps might appear at some points...", 5, 30);
     ofDrawBitmapString("Score: " + std::to_string(this->m_player->getScore()), panelWidth, 20);
     ofDrawBitmapString("Power: " + std::to_string(this->m_player->getPower()), panelWidth, 30);
     ofDrawBitmapString("Lives: " + std::to_string(this->m_player->getLives()), panelWidth, 40);
