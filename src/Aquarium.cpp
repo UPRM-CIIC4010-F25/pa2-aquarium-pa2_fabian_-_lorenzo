@@ -38,7 +38,8 @@ void PlayerCreature::move() {
     m_y += m_dy * m_speed;
 
     //Needed so fish doesn't move alone with no input is given
-    if(m_dx != 0) {
+    //Added bounds conditions so fish doesn't move up or down while hitting the walls
+    if(m_dx != 0 && m_x > 0 && m_x < m_width) {
         //Player fish will now move as a real fish cause why not....
         m_y += sin(m_x * 0.06f) * 4.0f;
     }
