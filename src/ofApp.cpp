@@ -89,7 +89,7 @@ void ofApp::update(){
          musicTimer +=  1.0f/60.0f;
 
         //Music will change once we have hit two minutes of gameplay
-        if(musicTimer >= 120.0f && !musicChanged) {
+        if(musicTimer >= 60.0f && !musicChanged) {
             if(gameMusic.isPlaying()) gameMusic.stop(); //stops original music to make way for new music
             if(gameMusic.load("Horroriffic.mp3")) {
                 gameMusic.setLoop(true);
