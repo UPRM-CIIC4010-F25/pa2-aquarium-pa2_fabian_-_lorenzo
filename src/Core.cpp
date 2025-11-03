@@ -21,9 +21,9 @@ void Creature::bounce() {
     if(m_x < 0)
     {
         m_x = 0;
-        // m_speed != 5 is checked to differentiate the player from most NPCs
-        //      as the player has a default speed of 5 but most NPCs don't, and
-        //      they should not behave in the same manner
+        //m_speed != 5 is checked to differentiate the player from most NPCs
+        //As the player has a default speed of 5 but most NPCs don't, and
+        //They should not behave in the same manner
         if (m_speed != 5)
             m_dx *= -1;
     }
@@ -119,7 +119,7 @@ void GameSceneManager::Transition(string name){
 
 void GameSceneManager::AddScene(std::shared_ptr<GameScene> newScene){
     if(this->GetScene(newScene->GetName()) != nullptr){
-        return; // this scene already exist and shouldnt be added again
+        return; // this scene already exist and shouldn't be added again
     }
     this->m_scenes.push_back(newScene);
     if(m_active_scene == nullptr){
