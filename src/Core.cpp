@@ -18,30 +18,32 @@ void Creature::normalize() {
 
 void Creature::bounce() {
     // should implement boundary controls here
-    if(m_x < 0)
+
+    // -15, -20, -30, and -35 are used as offsets to better match the screen size
+    if(m_x < -15)
     {
-        m_x = 0;
+        m_x = -15;
         // m_speed != 5 is checked to differentiate the player from most NPCs
         //      as the player has a default speed of 5 but most NPCs don't, and
         //      they should not behave in the same manner
         if (m_speed != 5)
             m_dx *= -1;
     }
-    if(m_x > m_width)
+    if(m_x > m_width-35)
     {
-        m_x = m_width;
+        m_x = m_width-35;
         if (m_speed != 5)
             m_dx *= -1;
     }
-    if(m_y < 0)
+    if(m_y < -20)
     {
-        m_y = 0;
+        m_y = -20;
         if (m_speed != 5)
             m_dy *= -1;
     }
-    if(m_y > m_height)
+    if(m_y > m_height-30)
     {
-        m_y = m_height;
+        m_y = m_height-30;
         if (m_speed != 5)
             m_dy *= -1;
     }
