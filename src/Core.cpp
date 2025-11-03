@@ -121,7 +121,7 @@ void GameSceneManager::Transition(string name){
 
 void GameSceneManager::AddScene(std::shared_ptr<GameScene> newScene){
     if(this->GetScene(newScene->GetName()) != nullptr){
-        return; // this scene already exist and shouldnt be added again
+        return; // this scene already exist and shouldn't be added again
     }
     this->m_scenes.push_back(newScene);
     if(m_active_scene == nullptr){

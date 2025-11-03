@@ -148,6 +148,7 @@ NewNemoCreature::NewNemoCreature(float x, float y, int speed, std::shared_ptr<Ga
 
 //Overide of move function in NewNemoCreature class
 void FastNPCreature::move() {
+    //As the name suggests, this new fish moves faster, Lightning McQueen fast
     m_x += m_dx * m_speed * 3;
     m_y += m_dy * m_speed * 3;
     if(m_dx < 0 ){

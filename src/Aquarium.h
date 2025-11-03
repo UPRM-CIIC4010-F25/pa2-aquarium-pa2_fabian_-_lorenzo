@@ -51,9 +51,12 @@ class AquariumLevel : public GameLevel {
         bool isCompleted() override;
         void populationReset();
         void levelReset(){m_level_score=0;this->populationReset();}
+        
         //Changed this function from virtual to non virtual since it will be implemented in this class
         //The classes that inherit from it will receive it directly, no needed to override
+        //Went from a polymorphic behavior to a more inheritance behavior
         std::vector<AquariumCreatureType> Repopulate();
+        
         // powerup functions
         bool canSpawnPowerUp() override;
         void setPowerUpScore(int score) { m_power_up_score = score; }
@@ -262,7 +265,7 @@ class Level_2 : public AquariumLevel  {
 
 
 };
-//New level 3 with its respective fish implemented
+//New level 3 with its respective fish implemented and its proper inheritance
 class Level_3 : public AquariumLevel {
     public:
     Level_3(int levelNumber, int targetScore, int powerUpScore): AquariumLevel(levelNumber, targetScore, powerUpScore){
@@ -274,7 +277,7 @@ class Level_3 : public AquariumLevel {
 
 
 };
-//New level 3 with its respective fish implemented
+//New level 4 with its respective fish implemented and its proper inheritance
 class Level_4 : public AquariumLevel {
 public:
     Level_4(int levelNumber, int targetScore, int powerUpScore): AquariumLevel(levelNumber, targetScore, powerUpScore){

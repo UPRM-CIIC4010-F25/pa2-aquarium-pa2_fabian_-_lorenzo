@@ -45,12 +45,11 @@ void ofApp::setup(){
         std::move(player), std::move(myAquarium), GameSceneKindToString(GameSceneKind::AQUARIUM_GAME)
     )); // player and aquarium are owned by the scene moving forward
 
-    // Music setup
+    // Initial Music setup
     if(gameMusic.load("rainyday.mp3") && !musicChanged) {
         gameMusic.setLoop(true);
         gameMusic.play();
         gameMusic.setVolume(0.75f);
-        musicChanged = false;
     } 
     else {
         ofLogError() << "Failed to load the awesome game gameMusic!";  // Added some an error message just in case
@@ -85,10 +84,11 @@ void ofApp::update(){
         auto gameScene = std::static_pointer_cast<AquariumGameScene>(gameManager->GetActiveScene());
 
         //Calculated time passed per each frame and added it to the timer
-        //Since the game run at 60FPS, one we have 60 frames we will have a second
+        //Since the game runs at 60FPS, one we have 60 frames we will have a second
+        //Didn't use openFrameworks function since I did not like how they calculated the time elapsed 
          musicTimer +=  1.0f/60.0f;
 
-        //Music will change once we have hit two minutes of gameplay
+        //Music will change once we have hit one minute of actual gameplay, not including intro
         if(musicTimer >= 60.0f && !musicChanged) {
             if(gameMusic.isPlaying()) gameMusic.stop(); //stops original music to make way for new music
             if(gameMusic.load("Horroriffic.mp3")) {
